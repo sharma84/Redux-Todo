@@ -1,55 +1,62 @@
 import React from "react";
 import { connect } from "react-redux";
-import { addNewTodo, toggleComplete } from "../actions";
-import TodoList from './TodoList';
+import { addTodo, toggleCompleted } from "../actions/index";
+import "../index.css";
 
 class TodoForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      newTodo: ""
-    };
-  }
+  state = {
+    newTodo: ""
+  };
 
   handleChanges = (e) => {
     this.setState({ newTodo: e.target.value });
   };
 
-  addNewTodo = (e) => {
+  handleAddToDo = (e) => {
     e.preventDefault();
-    this.props.addNewTodo({ value: this.state.newTodo, complete: false });
+    this.props.addTodo(this.state.newTodo);
+    //todo item typed (apple)is updated in newTodo through handleChanges. that apple(this.state.newTodo)argument is passed to actions as todoItem
     this.setState({ newTodo: "" });
   };
 
-  toggleComplete = (e, index) => {
-    e.preventDefault();
-    this.props.toggleComplete(index);
+  toggleCompleted = (id) => {
+    this.props.toggleCompleted(id);
   };
 
   render() {
     return (
       <div>
-        <form>
+        <div>
+          {this.props.todoItems.map((item) => (
+            <ul
+              className={`${item.completed ? "completed" : null}`}
+              key={item.id}
+              onClick={() => this.toggleCompleted(item.id)}
+            >
+              {item.todoItem}
+            </ul>
+          ))}
+        </div>
+        <div>
           <input
+            name="newTodo"
             type="text"
             value={this.state.newTodo}
             onChange={this.handleChanges}
-            placeholder="Add todo"
+            placeholder="Add your todo"
           />
-          <button onClick={this.addNewTodo}>Add Todo</button>
-
-        </form>
-        <TodoList todos={this.props.todos} />
+          <button onClick={this.handleAddToDo}>Add Your Todo</button>
+        </div>
       </div>
     );
   }
 }
 
 const mapStateToProps = (state) => ({
-  todos: state.todoReducer.todos
+  todoItems: state.todoItems
 });
 
 export default connect(
   mapStateToProps,
-  { addNewTodo, toggleComplete }
+  { addTodo, toggleCompleted }
 )(TodoForm);
